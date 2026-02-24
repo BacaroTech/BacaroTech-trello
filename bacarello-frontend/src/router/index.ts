@@ -2,18 +2,32 @@ import { createRouter, createWebHistory } from 'vue-router'
 import UserView from '@/views/UserView.vue'
 import AppHome from '@/views/AppHome.vue'
 import Search from '@/views/Search.vue'
+import BoardView from '@/views/BoardView.vue'
+import CardDetail from '@/components/CardDetail.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       name: 'home',
-      component: AppHome
+      component: AppHome,
+    },
+    {
+      path: '/board/:id',
+      name: 'board',
+      component: BoardView,
+      children: [
+        {
+          path: 'card/:cardId',
+          name: 'card',
+          component: CardDetail,
+        },
+      ],
     },
     {
       path: '/search',
       name: 'search',
-      component: Search
+      component: Search,
     },
     {
       path: '/user/:id',

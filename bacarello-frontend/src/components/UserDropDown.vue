@@ -16,14 +16,12 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Sun, Moon } from 'lucide-vue-next'
 import { useColorMode } from '@vueuse/core'
 const mode = useColorMode()
-import type { DropDownConfig } from './Navbar.vue';
+import type { DropDownConfig } from '../layout/Navbar.vue';
 import { Bell, Ellipsis } from 'lucide-vue-next';
 import { ref } from "vue"
 const activePanel = ref("root")
 defineProps<{ dropDowns: DropDownConfig[] }>()
 function toggleTheme(color: string) {
-    console.log(color);
-
     mode.value = color as "dark" | "auto" | "light"
 }
 </script>
@@ -35,7 +33,7 @@ function toggleTheme(color: string) {
             <DropdownMenuTrigger class="hover:bg-gray-300">
                 <img src="/images/profile.png" alt="" class="border rounded-lg h-8 w-8" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-56 mt-2">
+            <DropdownMenuContent class="w-56 mt-4">
                 <DropdownMenuLabel>{{ drop.label }}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <template v-for="item in drop.items" :key="item.id">

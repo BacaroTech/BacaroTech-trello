@@ -4,11 +4,12 @@ import {
 } from '@/components/ui/menubar'
 import Button from '@/components/ui/button/Button.vue';
 import { Inbox, Grid3x2,Calendar, Grid3x2Icon } from 'lucide-vue-next';
+import Board from './Board.vue';
 import { ref } from 'vue';
 import { useActiveBoardsStore } from '@/stores/active-board';
 import type { BottomBar } from '@/stores/active-board';
 const storeBoard = useActiveBoardsStore()
-
+import { markRaw } from 'vue';
 storeBoard.$patch({boards:[
     {
         id: "inbox",
@@ -16,14 +17,15 @@ storeBoard.$patch({boards:[
         active: false,
     },
     {
-        id: "board",
-        label: "Board",
-        active: false,
+      id: "planner",
+      label: "Planner",
+      active: false
     },
     {
-        id: "planner",
-        label: "Planner",
-        active: false
+        id: "board",
+        label: "Board",
+        component: markRaw(Board),
+        active: true,
     }
 ]})
 </script>

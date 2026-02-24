@@ -1,16 +1,18 @@
 <script lang="ts" setup>
-import draggable from 'vuedraggable'
+
 import { ref } from 'vue';
-const drag = ref(false)
-interface Task {
+import BoardNavbar from '../components/BoardNavbar.vue';
+import BoardCard from '../components/BoardCard.vue';
+export interface Task {
     id: string
     title: string
     description?: string
     labels?: string[]
     endTask?: string
+    completed?: boolean
 }
 
-interface Column {
+export interface Column {
     id: string
     name: string
     tasks: Task[]
@@ -59,22 +61,17 @@ const trelloMock = ref<Column[]>([
         ]
     }
 ])
+function handleAddTask({ columnId, task }: { columnId: string; task: Task }) {
+  const column = trelloMock.value.find(c => c.id === columnId)
+  if (!column) return
+
+  column.tasks.push(task)
+}
 </script>
 <template>
-    <div class="flex gap-6">
-        <div v-for="column in trelloMock" :key="column.id" class="w-64 bg-muted p-4 rounded-xl ">
-            <h3 class="font-semibold mb-3">{{ column.name }}</h3>
-            <draggable v-model="column.tasks" group="tasks" item-key="id" class="space-y-2 cursor-pointer">
-                <template #item="{ element }">
-                    <div class="bg-background p-3 rounded-lg shadow-sm">
-                        <p class="font-medium">{{ element.title }}</p>
-                        <p v-if="element.description" class="text-sm text-muted-foreground">
-                            {{ element.description }}
-                        </p>
-                    </div>
-                </template>
-            </draggable>
-        </div>
+    <div class="h-full flex flex-col overflow-hidden">
+        <BoardNavbar /> 
+        <BoardCard :tasks="trelloMock" @add-task="handleAddTask"/>
     </div>
 
 </template>

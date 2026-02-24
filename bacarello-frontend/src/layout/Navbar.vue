@@ -14,7 +14,7 @@ import {
 
 import Input from '@/components/ui/input/Input.vue';
 import Button from '@/components/ui/button/Button.vue';
-import UserDropDown from './UserDropDown.vue';
+import UserDropDown from '../components/UserDropDown.vue';
 import { LayoutGrid, Search } from 'lucide-vue-next';
 
 
@@ -59,15 +59,13 @@ const dropDowns: DropDownConfig[] = [{
 }]
 </script>
 <template>
-  <div class="flex justify-between py-2 w-full items-center navbar-bg">
+  <div class="flex justify-between py-1 w-full items-center navbar-bg">
     <div class="flex space-x-3">
       <DropdownMenu v-for="drop in dropDowns.filter(d => d.position === 'left')">
         <DropdownMenuTrigger class="ml-4">
           <LayoutGrid :size="20" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent class="mt-3">
-          <DropdownMenuLabel>{{ drop.label }}</DropdownMenuLabel>
-          <DropdownMenuSeparator />
+        <DropdownMenuContent class="mt-2">
           <DropdownMenuItem v-for="item in drop.items" :key="item.id">
             <router-link class="flex-1" :to="{ name: item.id, }" v-if="item?.route">
               {{ item.label }}
