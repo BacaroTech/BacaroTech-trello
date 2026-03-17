@@ -25,7 +25,7 @@ const boardBar = ref<BoardBar>({
 })
 </script>
 <template>
-    <div class="flex justify-between py-2 w-full items-center board-navbar z-99">
+    <div class="flex justify-between py-2 w-full items-center board-navbar z-50">
         <div class="flex space-x-3">
             <DropdownMenu v-for="drop in boardBar">
                 <DropdownMenuTrigger class="ml-4">

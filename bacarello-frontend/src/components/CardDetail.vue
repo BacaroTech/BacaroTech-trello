@@ -18,6 +18,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import CheckList from './CheckList.vue'
+import { useCardCheckList, type CheckList as CheckModel } from '@/stores/card';
 import {
     Popover,
     PopoverContent,
@@ -25,7 +26,7 @@ import {
 } from '@/components/ui/popover'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
-
+const cardEntity = useCardCheckList()
 const router = useRouter()
 const route = useRoute()
 
@@ -39,14 +40,18 @@ const open = ref<Record<string, boolean>>(
         checkList: false
     }
 )
-
+function addItemCheckList(item: CheckModel):void{
+    cardEntity.addItem(item)
+    open.value.checkList = false
+}
+const inputVal = ref<CheckModel>({label:''})
 </script>
 
 <template>
     <!-- Overlay -->
     <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
         <!-- Modal Container -->
-        <Card class="relative w-full max-w-2xl shadow-2xl h-[70%]">
+        <Card class="relative w-full max-w-3xl shadow-2xl h-full z-999">
             <CardHeader>
                 <X @click="close" class="absolute right-4 top-4 cursor-pointer" />
                 <CardTitle>To Do</CardTitle>
@@ -78,17 +83,20 @@ const open = ref<Record<string, boolean>>(
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent class="w-auto overflow-hidden p-0" align="start">
-                                <CardHeader>
+                                <CardHeader class="mt-2 flex items-center justify-between">
                                     <CardTitle>Add Checklist</CardTitle>
+                                    <div @click="open.checkList = false" class="hover:bg-accent p-2 rounded-lg cursor-pointer">
+                                        <X class="size-4"/>
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
-                                    <div class="flex">
+                                    <div class="flex flex-col mt-10 gap-4">
                                         <Label> Title</Label>
-                                        <Input />
+                                        <Input v-model="inputVal.label"/>
                                     </div>
                                 </CardContent>
-                                <CardFooter>
-                                    <Button>Add</Button>
+                                <CardFooter class="mt-2 mb-2 space-x-2">
+                                    <Button @click="addItemCheckList(inputVal)">Add</Button>
                                 </CardFooter>
                             </PopoverContent>
                         </Popover>
@@ -98,7 +106,10 @@ const open = ref<Record<string, boolean>>(
                     <Label>Description</Label>
                     <textarea name="text" ></textarea>
                 </div>
-                <CheckList />
+                <div class="overflow-y-auto max-h-[70%]">
+
+                    <CheckList />
+                </div>
             </CardContent>
             <CardFooter>
                 
