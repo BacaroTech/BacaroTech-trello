@@ -9,6 +9,12 @@ export interface ListItem {
   label: string
   checked?: boolean
 }
+export interface LabelItem {
+  id?: number
+  name: string
+  color: string
+  checked?: boolean
+}
 export const useCardCheckList = defineStore('checkList', () => {
   const items = ref<CheckList[]>([
     {
@@ -20,6 +26,15 @@ export const useCardCheckList = defineStore('checkList', () => {
       ],
     },
   ])
+  const colorVal = ref<LabelItem[]>([
+    { name: '', color: 'bg-green-500', },
+    { name: '', color: 'bg-blue-500' },
+    { name: '', color: 'bg-yellow-500' },
+    { name: '', color: 'bg-red-500' },
+    { name: '', color: 'bg-purple-500' },
+    { name: '', color: 'bg-teal-500' }
+  ])
+  const selectedLabels = ref<LabelItem[]>([])
   function addItem(itemLabel: CheckList): void {
     if (itemLabel && itemLabel.label != '') {
       items.value.push({ label: itemLabel.label, lists: [] })
@@ -27,7 +42,7 @@ export const useCardCheckList = defineStore('checkList', () => {
   }
   function addNewListItem(listItem: ListItem, labelId: CheckList):void {
     if (listItem && labelId) {
-      const checklist = items.value.find((c) => c.label === labelId.label)
+      const checklist = items.value.find((list) => list.label === labelId.label)
       if (checklist && checklist != undefined) {
         checklist.lists?.push({
           id: Date.now(),
@@ -37,8 +52,39 @@ export const useCardCheckList = defineStore('checkList', () => {
       }
     }
   }
-  function updateItem(label: ListItem, labelId: CheckList):void{
-    
+  function editListItem(listItem: ListItem, labelId: CheckList):void {
+    if (listItem && labelId){
+      const checklist = items.value.find((list) => list.label === labelId.label)
+      if (checklist) {
+        const item = checklist.lists?.find((itemList) => itemList.id === listItem.id)
+        if (item) {
+          item.label = listItem.label
+        }
+      }
+    }
   }
-  return { items, addItem,addNewListItem }
+  function createLabel(inputVal: any, labels: LabelItem[]):void {
+    if (!inputVal.value.label.trim()) return
+  
+    labels.push({
+      id: Date.now(),
+      name: inputVal.value.label,
+      color: inputVal.value.color
+    })
+  
+    inputVal.value.label = ''
+  }
+  
+  function addLabel(label: LabelItem) {
+    label.checked = !label.checked
+    console.log(selectedLabels.value)
+    const index = selectedLabels.value.findIndex(l => l.color === label.color)
+  
+    if (index === -1) {
+      selectedLabels.value.push(label)
+    } else {
+      selectedLabels.value.splice(index, 1)
+    }
+  }
+  return { items, addItem,addNewListItem, createLabel, colorVal, selectedLabels,addLabel,editListItem }
 })

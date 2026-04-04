@@ -11,14 +11,14 @@ import {
 import { X } from 'lucide-vue-next'
 import { Separator } from './ui/separator'
 import type { DateValue } from '@internationalized/date'
-import { getLocalTimeZone, today } from '@internationalized/date'
-import { ChevronDownIcon } from 'lucide-vue-next'
+import { ChevronDownIcon, TextAlignStart, Users, ListPlus, Timer, Bookmark, Search } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import CheckList from './CheckList.vue'
+import { InputGroup, InputGroupAddon, InputGroupInput, } from '@/components/ui/input-group'
 import { useCardCheckList, type CheckList as CheckModel } from '@/stores/card';
+import LabelComponent from './LabelComponent.vue'
 import {
     Popover,
     PopoverContent,
@@ -26,25 +26,30 @@ import {
 } from '@/components/ui/popover'
 import { ref } from 'vue'
 import type { Ref } from 'vue'
-const cardEntity = useCardCheckList()
+import Label from './ui/label/Label.vue'
+const { addItem, colorVal, addLabel, selectedLabels } = useCardCheckList()
 const router = useRouter()
 const route = useRoute()
-
 function close() {
     router.push({ name: 'board', params: { id: route.params.id } })
 }
-const date = ref(today(getLocalTimeZone())) as Ref<DateValue>
+const date = ref() as Ref<DateValue>
 const open = ref<Record<string, boolean>>(
     {
         date: false,
-        checkList: false
+        checkList: false,
+        labels: false,
+        editLabel: false,
+        members: false,
     }
 )
-function addItemCheckList(item: CheckModel):void{
-    cardEntity.addItem(item)
+function addItemCheckList(item: CheckModel): void {
+    addItem(item)
     open.value.checkList = false
 }
-const inputVal = ref<CheckModel>({label:''})
+const inputVal = ref<CheckModel>({ label: '' })
+
+
 </script>
 
 <template>
@@ -57,18 +62,20 @@ const inputVal = ref<CheckModel>({label:''})
                 <CardTitle>To Do</CardTitle>
             </CardHeader>
             <Separator />
-            <CardContent >  
+            <CardContent>
                 <div class="flex flex-col">
                     <p>{{ $route.params.cardId }}</p>
                     <div class="mt-5 space-x-2">
                         <Popover v-model:open="open.date">
                             <PopoverTrigger as-child>
-                                <Button id="date-picker" variant="outline" class="justify-between font-normal">
+                                <Button id="date-picker" variant="outline"
+                                    class="justify-between font-normal items-center">
+                                    <Timer />
                                     Dates
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent class="w-auto overflow-hidden p-0" align="start">
-                                <Calendar :model-value="date" @update:model-value="(value) => {
+                                <Calendar v-model="date" locale="it-IT" @update:model-value="(value) => {
                                     if (value) {
                                         date = value
                                         open.date = false
@@ -78,21 +85,23 @@ const inputVal = ref<CheckModel>({label:''})
                         </Popover>
                         <Popover v-model:open="open.checkList">
                             <PopoverTrigger as-child>
-                                <Button variant="outline" class="justify-between font-normal">
+                                <Button variant="outline" class="justify-between font-normal items-center">
+                                    <ListPlus />
                                     ChekList
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent class="w-auto overflow-hidden p-0" align="start">
                                 <CardHeader class="mt-2 flex items-center justify-between">
                                     <CardTitle>Add Checklist</CardTitle>
-                                    <div @click="open.checkList = false" class="hover:bg-accent p-2 rounded-lg cursor-pointer">
-                                        <X class="size-4"/>
+                                    <div @click="open.checkList = false"
+                                        class="hover:bg-accent p-2 rounded-lg cursor-pointer">
+                                        <X class="size-4" />
                                     </div>
                                 </CardHeader>
                                 <CardContent>
                                     <div class="flex flex-col mt-10 gap-4">
                                         <Label> Title</Label>
-                                        <Input v-model="inputVal.label"/>
+                                        <Input v-model="inputVal.label" />
                                     </div>
                                 </CardContent>
                                 <CardFooter class="mt-2 mb-2 space-x-2">
@@ -100,19 +109,99 @@ const inputVal = ref<CheckModel>({label:''})
                                 </CardFooter>
                             </PopoverContent>
                         </Popover>
+                        <Popover v-model:open="open.labels">
+                            <PopoverTrigger as-child>
+                                <Button variant="outline" class="justify-between font-normal items-center">
+                                    <Bookmark />
+                                    Labels
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent class="overflow-hidden p-0" align="start"
+                                v-show="open.labels && !open.editLabel">
+                                <CardHeader class="mt-2 flex items-center justify-between">
+                                    <CardTitle>Add Label</CardTitle>
+                                    <div @click="open.labels = false"
+                                        class="hover:bg-accent p-2 rounded-lg cursor-pointer">
+                                        <X class="size-4" />
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                   <LabelComponent :open="open" :color-val="colorVal" />
+                                </CardContent>
+                                <CardFooter class="mt-4 mb-2 space-x-2 justify-center">
+                                    <Button v-show="!open.editLabel" variant="outline" class="font-normal items-center"
+                                        @click="open.editLabel = true">
+                                        Create Label
+                                    </Button>
+                                    <Button v-show="open.editLabel">
+                                        Create
+                                    </Button>
+                                </CardFooter>
+                            </PopoverContent>
+                        </Popover>
+                        <Popover v-model:open="open.members">
+                            <PopoverTrigger as-child>
+                                <Button variant="outline" class="justify-between font-normal items-center">
+                                    <Users />
+                                    Members
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent class="w-auto overflow-hidden p-0 space-y-4" align="start">
+                                <CardHeader class="mt-2 flex items-center justify-between">
+                                    <CardTitle>Add Checklist</CardTitle>
+                                    <div @click="open.members = false"
+                                        class="hover:bg-accent p-2 rounded-lg cursor-pointer">
+                                        <X class="size-4" />
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <InputGroup>
+                                        <InputGroupInput placeholder="Search..." />
+                                        <InputGroupAddon>
+                                            <Search />
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </CardContent>
+                                <CardFooter class="mt-2 mb-2 space-x-2">
+                                    <Label>Board Members</Label>
+                                </CardFooter>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </div>
-                <div class="flex mt-10">
-                    <Label>Description</Label>
-                    <textarea name="text" ></textarea>
-                </div>
-                <div class="overflow-y-auto max-h-[70%]">
-
-                    <CheckList />
+                <div class="space-y-4">
+                    <div class="inline-flex flex-row items-center max-w-sm mt-10 gap-3">
+                        <div class="flex flex-row gap-1 items-center">
+                            <label>Due Date</label>
+                            <div v-for="value in selectedLabels" :class="value.color"
+                                class="border h-8 w-12 rounded-sm"></div>
+                        </div>
+                        <div class="inline-flex flex-col" v-show="date">
+                            <label>Due Date</label>
+                            <div class="inline-flex cursor-pointer flex-row input-bg justify-between gap-5 rounded-sm px-2 py-1"
+                                @click="open.date = !open.date">
+                                <div class="text-sm" v-text="date"></div>
+                                <ChevronDownIcon />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex mt-10 flex-col gap-2">
+                        <div class="grid grid-cols-[auto_1fr] items-center gap-2">
+                            <TextAlignStart />
+                            <div class="flex justify-between">
+                                <Label>Description</Label>
+                                <Button> Edit</Button>
+                            </div>
+                        </div>
+                        <textarea name="text"></textarea>
+                    </div>
+                    <div class="overflow-y-auto max-h-[70%]">
+                        <CheckList />
+                    </div>
                 </div>
             </CardContent>
             <CardFooter>
-                
+
             </CardFooter>
         </Card>
     </div>

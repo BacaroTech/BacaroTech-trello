@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import draggable from 'vuedraggable'
 import { useCardCheckList } from '@/stores/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
-const cardEntity = useCardCheckList()
+const { items, addNewListItem, editListItem } = useCardCheckList()
 import type { CheckList, ListItem } from '@/stores/card';
 import { ListChecks } from 'lucide-vue-next';
 const newItem = ref<CheckList>({
@@ -17,26 +17,30 @@ const activeItems = ref<{
     label: null
 })
 function addItemList(item: ListItem, listId: CheckList): void {
-    cardEntity.addNewListItem(item, listId)
+    if (item.label == '') return;
+    addNewListItem(item, listId)
+    item.label = ''
 }
-
+function editItem(item: ListItem, listId: CheckList): void{
+    editListItem(item, listId)
+    toggleItem(String(item.id))
+}
 function toggleItem(label: string | number): void {
     if (activeItems.value.label === label) {
         activeItems.value = { label: null }
     } else {
         activeItems.value = { label }
     }
-
     newItem.value.label = ''
 }
 </script>
 <template>
-    <section class="grid grid-cols-1 space-y-3" v-for="items in cardEntity.items">
+    <section class="grid grid-cols-1 space-y-3" v-for="item in items">
         <div class="flex gap-2 items-start">
-            <ListChecks class="size-s"/>
-            <span>{{ items.label }}</span>
+            <ListChecks class="size-s" />
+            <span>{{ item.label }}</span>
         </div>
-        <draggable v-model="items.lists" item-key="id" tag="ol" class="space-y-2 col-span-2">
+        <draggable v-model="item.lists" item-key="id" tag="ol" class="space-y-2 col-span-2">
             <template #item="{ element }">
                 <li class="flex gap-2 cursor-move"
                     :class="{ 'py-5 items-start': activeItems.label === element.id, 'items-center': !(activeItems.label === element.id) }">
@@ -49,21 +53,21 @@ function toggleItem(label: string | number): void {
                         class="relative flex flex-col w-full items-start space-y-3 border bg-accent rounded-lg">
                         <Input v-model="element.label" />
                         <div class="flex gap-2 p-2">
-                            <Button @click="addItemList(element.label, items)">Save</Button>
+                            <Button @click="editItem(element, item)">Save</Button>
                             <Button @click="toggleItem(element.id)">Cancel</Button>
                         </div>
                     </div>
                 </li>
             </template>
         </draggable>
-        <div v-show="!( activeItems.label === items.label)">
-            <Button @click="toggleItem(items.label)">Add a item</Button>
+        <div v-show="!(activeItems.label === item.label)">
+            <Button @click="toggleItem(item.label)">Add a item</Button>
         </div>
-        <div v-show="activeItems.label === items.label">
+        <div v-show="activeItems.label === item.label">
             <Input v-model="newItem.label" />
             <div class="flex justify-start gap-2 py-2">
-                <Button @click="addItemList(newItem, items)">Add</Button>
-                <Button @click="toggleItem(items.label)">Cancel</Button>
+                <Button @click="addItemList(newItem, item)">Add</Button>
+                <Button @click="toggleItem(item.label)">Cancel</Button>
             </div>
         </div>
 

@@ -45,7 +45,7 @@ import {
     InputGroupTextarea,
 } from '@/components/ui/input-group'
 import { useBoardDataStore } from '@/stores/board'
-const homeUserBoards = useBoardDataStore()
+const {createBoard} = useBoardDataStore()
 const formSchema = toTypedSchema(
     z.object({
         title: z
@@ -71,7 +71,7 @@ const { values, handleSubmit, resetForm } = useForm<BoardView>({
 })
 const onSubmit = handleSubmit((data: BoardView) => {
     data['id'] = 3
-    homeUserBoards.createBoard(data)
+    createBoard(data)
 })
 const debouncedFn = useDebounceFn(() => {
     console.log(values.owner)
