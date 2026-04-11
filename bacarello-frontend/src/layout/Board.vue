@@ -64,7 +64,6 @@ const trelloMock = ref<Column[]>([
 function handleAddTask({ columnId, task }: { columnId: string; task: Task }) {
   const column = trelloMock.value.find(c => c.id === columnId)
   if (!column) return
-
   column.tasks.push(task)
 }
 </script>

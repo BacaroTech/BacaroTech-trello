@@ -1,3 +1,4 @@
+import type { Task } from '@/layout/Board.vue'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 export interface CheckList {
@@ -10,7 +11,7 @@ export interface ListItem {
   checked?: boolean
 }
 export interface LabelItem {
-  id?: number
+  id?: string
   name: string
   color: string
   checked?: boolean
@@ -67,7 +68,7 @@ export const useCardCheckList = defineStore('checkList', () => {
     if (!inputVal.value.label.trim()) return
   
     labels.push({
-      id: Date.now(),
+      id: String(Date.now()),
       name: inputVal.value.label,
       color: inputVal.value.color
     })
@@ -75,13 +76,11 @@ export const useCardCheckList = defineStore('checkList', () => {
     inputVal.value.label = ''
   }
   
-  function addLabel(label: LabelItem) {
+  function addLabel(label: LabelItem, listId: string) {
     label.checked = !label.checked
-    console.log(selectedLabels.value)
     const index = selectedLabels.value.findIndex(l => l.color === label.color)
-  
     if (index === -1) {
-      selectedLabels.value.push(label)
+      selectedLabels.value.push({name:label.name,color: label.color, id: listId })
     } else {
       selectedLabels.value.splice(index, 1)
     }

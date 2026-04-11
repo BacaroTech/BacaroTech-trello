@@ -83,7 +83,7 @@ const inputVal = ref<CheckModel>({ label: '' })
                                 }" />
                             </PopoverContent>
                         </Popover>
-                        <Popover v-model:open="open.checkList">
+                        <Popover :open="open.checkList" @update:open="(val) => open.checkList = val">
                             <PopoverTrigger as-child>
                                 <Button variant="outline" class="justify-between font-normal items-center">
                                     <ListPlus />
@@ -126,7 +126,7 @@ const inputVal = ref<CheckModel>({ label: '' })
                                     </div>
                                 </CardHeader>
                                 <CardContent>
-                                   <LabelComponent :open="open" :color-val="colorVal" />
+                                   <LabelComponent :open="open" :color-val="colorVal" :list="$route.params.cardId"/>
                                 </CardContent>
                                 <CardFooter class="mt-4 mb-2 space-x-2 justify-center">
                                     <Button v-show="!open.editLabel" variant="outline" class="font-normal items-center"
@@ -171,8 +171,8 @@ const inputVal = ref<CheckModel>({ label: '' })
                 </div>
                 <div class="space-y-4">
                     <div class="inline-flex flex-row items-center max-w-sm mt-10 gap-3">
-                        <div class="flex flex-row gap-1 items-center">
-                            <label>Due Date</label>
+                        <div class="flex flex-row gap-1 items-center" v-show="selectedLabels.length > 0">
+                            <label>Labels</label>
                             <div v-for="value in selectedLabels" :class="value.color"
                                 class="border h-8 w-12 rounded-sm"></div>
                         </div>
