@@ -11,7 +11,7 @@ import {
 import { X } from 'lucide-vue-next'
 import { Separator } from './ui/separator'
 import type { DateValue } from '@internationalized/date'
-import { ChevronDownIcon, TextAlignStart, Users, ListPlus, Timer, Bookmark, Search } from 'lucide-vue-next'
+import { ChevronDownIcon, TextAlignStart, Users, ListPlus, Timer, Bookmark, Search, ChevronLeft } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
@@ -24,7 +24,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import Label from './ui/label/Label.vue'
 const { addItem, colorVal, addLabel, selectedLabels } = useCardCheckList()
@@ -33,6 +33,7 @@ const route = useRoute()
 function close() {
     router.push({ name: 'board', params: { id: route.params.id } })
 }
+
 const date = ref() as Ref<DateValue>
 const open = ref<Record<string, boolean>>(
     {
@@ -119,7 +120,11 @@ const inputVal = ref<CheckModel>({ label: '' })
                             <PopoverContent class="overflow-hidden p-0" align="start"
                                 v-show="open.labels && !open.editLabel">
                                 <CardHeader class="mt-2 flex items-center justify-between">
-                                    <CardTitle>Add Label</CardTitle>
+                                    <div v-show="open.editLabel" class="flex justify-between items-center p-2">
+                                        <ChevronLeft @click="open.editLabel = false" class="cursor-pointer hover:bg-accent" />
+                                        <CardTitle>Edit Label</CardTitle>
+                                    </div>
+                                    <CardTitle v-show="!open.editLabel">Add Label</CardTitle>
                                     <div @click="open.labels = false"
                                         class="hover:bg-accent p-2 rounded-lg cursor-pointer">
                                         <X class="size-4" />
@@ -133,9 +138,11 @@ const inputVal = ref<CheckModel>({ label: '' })
                                         @click="open.editLabel = true">
                                         Create Label
                                     </Button>
-                                    <Button v-show="open.editLabel">
-                                        Create
-                                    </Button>
+                                    <div v-show="open.editLabel" variant="outline" class="font-normal items-center">
+                                        <Button>
+                                            Save
+                                        </Button>
+                                    </div>
                                 </CardFooter>
                             </PopoverContent>
                         </Popover>
@@ -174,13 +181,13 @@ const inputVal = ref<CheckModel>({ label: '' })
                         <div class="flex flex-row gap-1 items-center" v-show="selectedLabels.length > 0">
                             <label>Labels</label>
                             <div v-for="value in selectedLabels" :class="value.color"
-                                class="border h-8 w-12 rounded-sm"></div>
+                                class="border h-8 w-12 rounded-sm" v-show="value.id === $route.params.cardId"></div>
                         </div>
                         <div class="inline-flex flex-col" v-show="date">
                             <label>Due Date</label>
                             <div class="inline-flex cursor-pointer flex-row input-bg justify-between gap-5 rounded-sm px-2 py-1"
                                 @click="open.date = !open.date">
-                                <div class="text-sm" v-text="date"></div>
+                                <div class="text-sm">{{ date }}</div>
                                 <ChevronDownIcon />
                             </div>
                         </div>
