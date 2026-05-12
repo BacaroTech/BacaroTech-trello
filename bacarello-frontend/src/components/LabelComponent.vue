@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { Checkbox } from './ui/checkbox'
+import { Button } from './ui/button';
 import { SquarePen, Check } from 'lucide-vue-next';
 const props = defineProps(['open', 'colorVal', 'list'])
 import { useCardCheckList, type LabelItem } from '@/stores/card';
@@ -14,30 +15,34 @@ function addNewLabel(color: LabelItem, taskId: string) {
 }
 
 const colors = ref<LabelItem[]>([
-  { name: '', color: 'bg-green-500', checked: false },
-  { name: '', color: 'bg-blue-500', checked: false },
-  { name: '', color: 'bg-red-500', checked: false },
-  { name: '', color: 'bg-stone-500', checked: false },
-  { name: '', color: 'bg-violet-500', checked: false },
-  { name: '', color: 'bg-green-600', checked: false },
-  { name: '', color: 'bg-blue-600', checked: false },
-  { name: '', color: 'bg-red-600', checked: false },
-  { name: '', color: 'bg-stone-600', checked: false },
-  { name: '', color: 'bg-violet-600', checked: false },
-  { name: '', color: 'bg-green-700', checked: false },
-  { name: '', color: 'bg-blue-700', checked: false },
-  { name: '', color: 'bg-red-700', checked: false },
-  { name: '', color: 'bg-stone-700', checked: false },
-  { name: '', color: 'bg-violet-700', checked: false }
+    { name: '', color: 'bg-green-500', checked: false },
+    { name: '', color: 'bg-blue-500', checked: false },
+    { name: '', color: 'bg-red-500', checked: false },
+    { name: '', color: 'bg-stone-500', checked: false },
+    { name: '', color: 'bg-violet-500', checked: false },
+    { name: '', color: 'bg-green-600', checked: false },
+    { name: '', color: 'bg-blue-600', checked: false },
+    { name: '', color: 'bg-red-600', checked: false },
+    { name: '', color: 'bg-stone-600', checked: false },
+    { name: '', color: 'bg-violet-600', checked: false },
+    { name: '', color: 'bg-green-700', checked: false },
+    { name: '', color: 'bg-blue-700', checked: false },
+    { name: '', color: 'bg-red-700', checked: false },
+    { name: '', color: 'bg-stone-700', checked: false },
+    { name: '', color: 'bg-violet-700', checked: false }
 ])
-const selectedColor = ref<LabelItem>({color:'',name:''})
-function toggleColor(label: LabelItem){
+const selectedColor = ref<LabelItem>({ color: '', name: '' })
+function toggleColor(label: LabelItem) {
     label.checked = !label.checked
-    if (selectedColor.value && selectedColor.value.color == '') {    
+    if (selectedColor.value && selectedColor.value.color == '') {
         selectedColor.value.color = label.color
     } else {
         selectedColor.value.color = ''
     }
+}
+function save(taskId: string){
+    if(taskId == "" && selectedColor.value.color == "") return
+    addLabel(selectedColor.value, taskId)
 }
 </script>
 <template>
@@ -62,8 +67,7 @@ function toggleColor(label: LabelItem){
         <!-- CHild-->
         <div v-show="open.editLabel" class="space-y-10">
             <div class="bg-black w-full p-4 rounded-md flex justify-center">
-                <div class="px-3 py-1 rounded-sm text-white text-sm font-medium w-full" 
-                :class="selectedColor.color">
+                <div class="px-3 py-1 rounded-sm text-white text-sm font-medium w-full" :class="selectedColor.color">
                     <span>{{ selectedColor.name }}</span>
                 </div>
             </div>
@@ -73,12 +77,16 @@ function toggleColor(label: LabelItem){
             </div>
             <div class="flex flex-col gap-1">
                 <div class="grid grid-cols-5 space-y-5">
-                    <div v-for="value in colors" :class="value.color" class="w-12 h-8 rounded-md cursor-pointer flex justify-center items-center" 
-                    @click="toggleColor(value)">
-                    <Check v-show="value.checked"/>
+                    <div v-for="value in colors" :class="value.color"
+                        class="w-12 h-8 rounded-md cursor-pointer flex justify-center items-center"
+                        @click="toggleColor(value)">
+                        <Check v-show="value.checked" />
                     </div>
                 </div>
             </div>
+            <Button variant="outline" class="font-normal items-center justify-center" @click="save(list)">
+                Save
+            </Button>
         </div>
     </div>
 </template>

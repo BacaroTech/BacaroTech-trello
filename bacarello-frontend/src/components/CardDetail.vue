@@ -8,7 +8,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import { X } from 'lucide-vue-next'
+import { X, SquarePlus } from 'lucide-vue-next'
 import { Separator } from './ui/separator'
 import type { DateValue } from '@internationalized/date'
 import { ChevronDownIcon, TextAlignStart, Users, ListPlus, Timer, Bookmark, Search, ChevronLeft } from 'lucide-vue-next'
@@ -121,7 +121,8 @@ const inputVal = ref<CheckModel>({ label: '' })
                                 v-show="open.labels && !open.editLabel">
                                 <CardHeader class="mt-2 flex items-center justify-between">
                                     <div v-show="open.editLabel" class="flex justify-between items-center p-2">
-                                        <ChevronLeft @click="open.editLabel = false" class="cursor-pointer hover:bg-accent" />
+                                        <ChevronLeft @click="open.editLabel = false"
+                                            class="cursor-pointer hover:bg-accent" />
                                         <CardTitle>Edit Label</CardTitle>
                                     </div>
                                     <CardTitle v-show="!open.editLabel">Add Label</CardTitle>
@@ -131,18 +132,13 @@ const inputVal = ref<CheckModel>({ label: '' })
                                     </div>
                                 </CardHeader>
                                 <CardContent>
-                                   <LabelComponent :open="open" :color-val="colorVal" :list="$route.params.cardId"/>
+                                    <LabelComponent :open="open" :color-val="colorVal" :list="$route.params.cardId" />
                                 </CardContent>
                                 <CardFooter class="mt-4 mb-2 space-x-2 justify-center">
                                     <Button v-show="!open.editLabel" variant="outline" class="font-normal items-center"
                                         @click="open.editLabel = true">
                                         Create Label
                                     </Button>
-                                    <div v-show="open.editLabel" variant="outline" class="font-normal items-center">
-                                        <Button>
-                                            Save
-                                        </Button>
-                                    </div>
                                 </CardFooter>
                             </PopoverContent>
                         </Popover>
@@ -178,10 +174,20 @@ const inputVal = ref<CheckModel>({ label: '' })
                 </div>
                 <div class="space-y-4">
                     <div class="inline-flex flex-row items-center max-w-sm mt-10 gap-3">
-                        <div class="flex flex-row gap-1 items-center" v-show="selectedLabels.length > 0">
+                        <div class="flex flex-col gap-1 items-start" v-show="selectedLabels.length > 0">
                             <label>Labels</label>
-                            <div v-for="value in selectedLabels" :class="value.color"
-                                class="border h-8 w-12 rounded-sm" v-show="value.id === $route.params.cardId"></div>
+                            <div class="flex flex-row items-center gap-0.5">
+                                <div v-for="value in selectedLabels" :class="value.color"
+                                    class="border h-8 w-12 rounded-sm" v-show="value.id === $route.params.cardId"></div>
+                                <SquarePlus @click="open.labels = !open.labels" />
+                                <Popover>
+                                    <PopoverContent class="overflow-hidden p-0" align="start">
+                                        <LabelComponent :open="open" :color-val="colorVal"
+                                            :list="$route.params.cardId" />
+                                    </PopoverContent>
+                                </Popover>
+
+                            </div>
                         </div>
                         <div class="inline-flex flex-col" v-show="date">
                             <label>Due Date</label>
